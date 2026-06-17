@@ -10,7 +10,7 @@ import { todosRouter, seedTodos } from "./routes/todos.js";
 import { authRouter } from "./routes/auth.js";
 
 const app = express();
-const PORT = Number(process.env.PORT) || 3001;
+const PORT = Number(process.env.PORT) || 3890;
 
 // Built client assets live at client/dist, one level up from both api/src
 // (dev via tsx) and api/dist (built via tsc), so the relative path is the same.
