@@ -1,0 +1,235 @@
+/*
+ * Hand-Drawn design system — global styles.
+ *
+ * The :root custom properties below are the single source of truth for the
+ * palette, fonts and shadows. `theme.ts` exposes the same tokens to TS (as
+ * `var(--hd-*)` strings) for inline styles, and the component classes in this
+ * file own the pseudo-state interactions (hover / focus / active) that inline
+ * styles can't express.
+ */
+
+:root {
+  /* Palette (light mode, single palette) */
+  --hd-bg: #fdfbf7; /* warm paper */
+  --hd-fg: #2d2d2d; /* soft pencil black — never pure black */
+  --hd-muted: #e5e0d8; /* old paper / erased pencil */
+  --hd-accent: #ff4d4d; /* red correction marker */
+  --hd-accent-2: #2d5da1; /* blue ballpoint pen */
+  --hd-card: #ffffff; /* clean paper */
+  --hd-postit: #fff9c4; /* post-it yellow */
+
+  /* Type */
+  --hd-font-heading: "Kalam", "Comic Sans MS", cursive;
+  --hd-font-body: "Patrick Hand", "Comic Sans MS", cursive;
+
+  /* Wobbly radii — irregular organic ellipses, never geometric */
+  --hd-wobbly: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  --hd-wobbly-md: 18px 220px 24px 220px / 220px 20px 220px 22px;
+  --hd-wobbly-alt: 220px 18px 220px 26px / 20px 220px 22px 220px;
+
+  /* Hard offset shadows — no blur, ever */
+  --hd-shadow-soft: 3px 3px 0 0 rgba(45, 45, 45, 0.12);
+  --hd-shadow: 4px 4px 0 0 var(--hd-fg);
+  --hd-shadow-lg: 8px 8px 0 0 var(--hd-fg);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--hd-font-body);
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--hd-fg);
+  background-color: var(--hd-bg);
+  /* Notebook-paper dot grain */
+  background-image: radial-gradient(var(--hd-muted) 1px, transparent 1px);
+  background-size: 24px 24px;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--hd-font-heading);
+  font-weight: 700;
+  line-height: 1.1;
+  margin: 0;
+}
+
+/* Respect users who prefer less motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Buttons — irregular wobbly ovals that "press flat" when clicked.
+ * ------------------------------------------------------------------ */
+.hd-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 48px;
+  padding: 0.5rem 1.25rem;
+  font-family: var(--hd-font-body);
+  font-size: 1.1rem;
+  color: var(--hd-fg);
+  background: var(--hd-card);
+  border: 3px solid var(--hd-fg);
+  border-radius: var(--hd-wobbly);
+  box-shadow: var(--hd-shadow);
+  cursor: pointer;
+  transition:
+    transform 100ms ease,
+    background-color 100ms ease,
+    color 100ms ease,
+    box-shadow 100ms ease;
+}
+
+.hd-btn:hover {
+  background: var(--hd-accent);
+  color: #fff;
+  box-shadow: 2px 2px 0 0 var(--hd-fg);
+  transform: translate(2px, 2px) rotate(-1deg);
+}
+
+.hd-btn:active {
+  box-shadow: 0 0 0 0 var(--hd-fg);
+  transform: translate(4px, 4px);
+}
+
+.hd-btn:focus-visible {
+  outline: none;
+  border-color: var(--hd-accent-2);
+  box-shadow:
+    var(--hd-shadow),
+    0 0 0 4px rgba(45, 93, 161, 0.25);
+}
+
+.hd-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: var(--hd-shadow);
+  background: var(--hd-card);
+  color: var(--hd-fg);
+}
+
+.hd-btn--secondary {
+  background: var(--hd-muted);
+}
+.hd-btn--secondary:hover {
+  background: var(--hd-accent-2);
+  color: #fff;
+}
+
+/* Square-ish icon button */
+.hd-btn--icon {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.4rem;
+  border-radius: 220px 20px 220px 22px / 20px 220px 24px 220px;
+}
+
+/* ------------------------------------------------------------------ *
+ * Inputs — full wobbly box, blue ballpoint focus ring.
+ * ------------------------------------------------------------------ */
+.hd-input {
+  width: 100%;
+  padding: 0.65rem 0.95rem;
+  font-family: var(--hd-font-body);
+  font-size: 1.1rem;
+  color: var(--hd-fg);
+  background: var(--hd-card);
+  border: 2px solid var(--hd-fg);
+  border-radius: var(--hd-wobbly-md);
+  transition:
+    border-color 100ms ease,
+    box-shadow 100ms ease;
+}
+
+.hd-input::placeholder {
+  color: rgba(45, 45, 45, 0.4);
+}
+
+.hd-input:focus {
+  outline: none;
+  border-color: var(--hd-accent-2);
+  box-shadow: 0 0 0 3px rgba(45, 93, 161, 0.2);
+}
+
+/* ------------------------------------------------------------------ *
+ * Cards — cut-paper containers, optionally jiggling on hover.
+ * ------------------------------------------------------------------ */
+.hd-card {
+  background: var(--hd-card);
+  border: 2px solid var(--hd-fg);
+  box-shadow: var(--hd-shadow-soft);
+  /* Per-instance tilt is passed in as --hd-tilt so the :hover rule below can
+     compose with it (inline transforms would otherwise block the hover). */
+  transform: rotate(var(--hd-tilt, 0deg));
+}
+
+.hd-card--interactive {
+  transition:
+    transform 100ms ease,
+    box-shadow 100ms ease;
+}
+.hd-card--interactive:hover {
+  transform: rotate(calc(var(--hd-tilt, 0deg) - 1deg)) translateY(-2px);
+  box-shadow: 6px 6px 0 0 rgba(45, 45, 45, 0.18);
+}
+
+/* ------------------------------------------------------------------ *
+ * Decorative flourishes.
+ * ------------------------------------------------------------------ */
+.hd-wavy-underline {
+  text-decoration: underline wavy var(--hd-accent);
+  text-underline-offset: 6px;
+  text-decoration-thickness: 2px;
+}
+
+@keyframes hd-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+.hd-bounce {
+  animation: hd-bounce 3s ease-in-out infinite;
+}
+
+.hd-link {
+  color: var(--hd-accent-2);
+  text-decoration: none;
+  border-bottom: 2px dashed currentColor;
+}
+.hd-link:hover {
+  text-decoration: line-through;
+}
+
+/* Hide purely decorative flourishes on small screens (per design spec). */
+@media (max-width: 768px) {
+  .hd-desktop-only {
+    display: none !important;
+  }
+}

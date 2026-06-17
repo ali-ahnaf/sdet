@@ -1,0 +1,25 @@
+{
+  "name": "sdet",
+  "version": "1.0.0",
+  "private": true,
+  "description": "npm workspaces monorepo: api, client, shared",
+  "workspaces": [
+    "shared",
+    "api",
+    "client"
+  ],
+  "scripts": {
+    "build": "npm run build -w @sdet/shared && npm run build -w @sdet/api && npm run build -w @sdet/client",
+    "dev": "npm run build -w @sdet/shared && concurrently -n shared,api,client -c blue,green,magenta \"npm run dev -w @sdet/shared\" \"npm run dev -w @sdet/api\" \"npm run dev -w @sdet/client\"",
+    "dev:api": "npm run dev -w @sdet/api",
+    "dev:client": "npm run dev -w @sdet/client",
+    "clean": "npm run clean --workspaces --if-present"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "typescript": "^5.6.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
