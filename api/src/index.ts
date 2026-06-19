@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import os from "node:os";
 import express from "express";
 import cors from "cors";
 import { AppDataSource } from "./data-source.js";
@@ -17,11 +18,36 @@ const PORT = Number(process.env.PORT) || 3890;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const clientDist = path.resolve(__dirname, "../../client/dist");
 
+// Persists request counts per PID across calls within this process lifetime.
+const requestCountByPid = new Map<number, number>();
+
 app.use(cors());
 app.use(express.json());
 
 app.get("/api/pid", (_req, res) => {
   res.json({ pid: process.pid });
+});
+
+app.get("/api/whoami", (_req, res) => {
+  const pid = process.pid;
+  const count = (requestCountByPid.get(pid) ?? 0) + 1;
+  requestCountByPid.set(pid, count);
+
+  res.json({
+    pid,
+    port: process.env.PORT,
+    hostname: os.hostname(),
+    pm2_instance: process.env.NODE_APP_INSTANCE,
+    uptime_seconds: Math.floor(process.uptime()),
+    requests_handled: count,
+    all_pid_counts: Object.fromEntries(requestCountByPid),
+    memory_mb: Math.round(process.memoryUsage().rss / 1024 / 1024),
+    timestamp: new Date().toISOString(),
+  });
+});
+
+app.get("/api/stats", (_req, res) => {
+  res.json({ request_counts_by_pid: Object.fromEntries(requestCountByPid) });
 });
 
 app.use(healthRouter);
