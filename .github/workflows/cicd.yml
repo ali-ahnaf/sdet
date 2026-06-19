@@ -64,8 +64,9 @@ jobs:
           ssh-keyscan -H "$VPS_HOST" >> ~/.ssh/known_hosts
 
           rsync -az --delete \
+            --exclude='*.sqlite' \
             -e "ssh -i ~/.ssh/deploy_key" \
             ./ "$VPS_USER@$VPS_HOST:$DEPLOY_PATH/"
 
           ssh -i ~/.ssh/deploy_key "$VPS_USER@$VPS_HOST" \
-            "cd $DEPLOY_PATH && npm ci --omit=dev && pm2 reload ecosystem.config.cjs --update-env || pm2 start ecosystem.config.cjs"
+            "cd $DEPLOY_PATH && npm ci --omit=dev && cd api && ../node_modules/.bin/typeorm -d dist/data-source.js migration:run && cd .. && pm2 reload ecosystem.config.cjs --update-env || pm2 start ecosystem.config.cjs"
