@@ -28,7 +28,7 @@ app.use(authRouter);
 const workerColors: Record<number, string> = { 0: "#ff6666", 1: "#66ff66", 2: "#6666ff", 3: "#ffff66" };
 const workerCounts: Record<number, number> = {};
 
-app.get("/lb-test", (_req, res) => {
+app.get("/api/lb-test", (_req, res) => {
   workerCounts[process.pid] = (workerCounts[process.pid] || 0) + 1;
   res.send(`
     <html>
@@ -39,7 +39,7 @@ app.get("/lb-test", (_req, res) => {
   `);
 });
 
-app.get("/lb-count", (_req, res) => {
+app.get("/api/lb-count", (_req, res) => {
   workerCounts[process.pid] = (workerCounts[process.pid] || 0) + 1;
   res.json({ pid: process.pid, requestsHandled: workerCounts[process.pid] });
 });
