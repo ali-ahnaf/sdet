@@ -20,6 +20,10 @@ const clientDist = path.resolve(__dirname, "../../client/dist");
 app.use(cors());
 app.use(express.json());
 
+app.get("/api/pid", (_req, res) => {
+  res.json({ pid: process.pid });
+});
+
 app.use(healthRouter);
 app.use(usersRouter);
 app.use(todosRouter);
