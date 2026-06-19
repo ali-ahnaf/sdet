@@ -1,5 +1,8 @@
 import "reflect-metadata";
 import path from "node:path";
+
+// Load .env before anything reads process.env
+process.loadEnvFile(new URL("../.env", import.meta.url));
 import { fileURLToPath } from "node:url";
 import os from "node:os";
 import express from "express";
@@ -9,6 +12,9 @@ import { healthRouter } from "./routes/health.js";
 import { usersRouter } from "./routes/users.js";
 import { todosRouter, seedTodos } from "./routes/todos.js";
 import { authRouter } from "./routes/auth.js";
+import { aiRouter } from "./routes/ai.js";
+import { jobsRouter } from "./routes/jobs.js";
+import { queueService } from "./queues/queue.service.js";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3890;
@@ -54,6 +60,8 @@ app.use(healthRouter);
 app.use(usersRouter);
 app.use(todosRouter);
 app.use(authRouter);
+app.use(aiRouter);
+app.use(jobsRouter);
 
 // Serve the built UI from the same server. Static files first, then an SPA
 // fallback that returns index.html for any non-API route so client-side
@@ -77,3 +85,10 @@ AppDataSource.initialize()
     console.error("[api] failed to initialize data source", err);
     process.exit(1);
   });
+
+for (const sig of ["SIGINT", "SIGTERM"]) {
+  process.once(sig, async () => {
+    await queueService.close();
+    process.exit(0);
+  });
+}
