@@ -63,6 +63,25 @@ app.use(authRouter);
 app.use(aiRouter);
 app.use(jobsRouter);
 
+const workerColors: Record<number, string> = { 0: "#ff6666", 1: "#66ff66", 2: "#6666ff", 3: "#ffff66" };
+const workerCounts: Record<number, number> = {};
+
+app.get("/api/lb-test", (_req, res) => {
+  workerCounts[process.pid] = (workerCounts[process.pid] || 0) + 1;
+  res.send(`
+    <html>
+      <body style="background:${workerColors[process.pid % 4]};font-size:60px;text-align:center;padding-top:100px">
+        Worker PID: ${process.pid}
+      </body>
+    </html>
+  `);
+});
+
+app.get("/api/lb-count", (_req, res) => {
+  workerCounts[process.pid] = (workerCounts[process.pid] || 0) + 1;
+  res.json({ pid: process.pid, requestsHandled: workerCounts[process.pid] });
+});
+
 // Serve the built UI from the same server. Static files first, then an SPA
 // fallback that returns index.html for any non-API route so client-side
 // routing works on deep links / refreshes.
